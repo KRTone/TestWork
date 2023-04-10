@@ -34,6 +34,7 @@ namespace Consumer.Infastructure.Repositories
         {
             Organization? organization = await _context
                 .Organizations
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Guid == organizationGuid, token);
 
             if (organization == null)
@@ -46,6 +47,7 @@ namespace Consumer.Infastructure.Repositories
             return await entry
                 .Collection(x => x.Users)
                 .Query()
+                .AsNoTracking()
                 .Skip(paging.Skip)
                 .Take(paging.Count)
                 .ToListAsync();

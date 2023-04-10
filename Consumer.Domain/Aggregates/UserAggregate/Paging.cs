@@ -2,19 +2,16 @@
 
 namespace Consumer.Domain.Aggregates.UserAggregate
 {
-    public record Paging
+    public class Paging
     {
-        public Paging() : this(1, 20)
-        {
-
-        }
-
         public Paging(int page, int count)
         {
-            if (Page < 1 && count < 1)
+            if (page < 0 && count < 1)
             {
                 throw new ConsumerDomainException(nameof(Paging));
             }
+            Page = page;
+            Count = count;
         }
 
         public int Page { get; private set; }

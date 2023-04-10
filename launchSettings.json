@@ -4,7 +4,7 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        //"consumer.webapi": "StartDebugging",
+        "consumer.webapi": "StartDebugging",
         "producer.webapi": "StartDebugging",
         "rabbitmq": "StartWithoutDebugging"
       }

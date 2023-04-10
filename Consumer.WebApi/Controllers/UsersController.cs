@@ -1,6 +1,6 @@
+using AutoMapper;
 using Consumer.Application.Commands;
 using Consumer.Application.Queries;
-using Consumer.Domain.Aggregates.UserAggregate;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +11,12 @@ namespace Consumer.WebApi.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public UsersController(IMediator mediator) 
+        public UsersController(IMediator mediator, IMapper mapper) 
         {
             _mediator = mediator;
+            _mapper = mapper;
         }
 
 
@@ -25,9 +27,10 @@ namespace Consumer.WebApi.Controllers
         }
 
         [HttpPost("GetPageByOrganization")]
-        public Task<List<User>> GetPage(GetUsersQuery query)
+        public async Task<List<ViewModels.User>> GetPage(GetUsersQuery query)
         {
-            return _mediator.Send(query);
+            var users = await _mediator.Send(query);
+            return _mapper.Map<List<ViewModels.User>>(users);
         }
     }
 }

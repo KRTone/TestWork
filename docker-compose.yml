@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+  producer.webapi:
+    image: ${DOCKER_REGISTRY-}producerwebapi
+    build:
+      context: .
+      dockerfile: Producer.WebApi/Dockerfile
+    depends_on:
+      - rabbitmq
+
+  consumer.webapi:
+    image: ${DOCKER_REGISTRY-}consumerwebapi
+    build:
+      context: .
+      dockerfile: Consumer.WebApi/Dockerfile
+    depends_on:
+      - rabbitmq
+      - db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: "rabbitmq"
+    ports:
+    - "5671:5671"
+    - "5672:5672"
+    - "15671:15671"
+    - "15672:15672"
+  db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    ports:
+        - "5434:1433"
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=Pass@word

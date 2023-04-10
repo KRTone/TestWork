@@ -18,15 +18,14 @@ namespace Consumer.WebApi.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("MoveUserToOrganization")]
         public Task PostOrganization(MoveUserToOrganizationCommand command)
         {
             return _mediator.Send(command);
         }
 
-        [HttpPost]
-        [ProducesResponseType(typeof(List<User>), StatusCodes.Status200OK)]
-        public Task<List<User>> PostOrganization(GetUsersQuery query)
+        [HttpPost("GetPageByOrganization")]
+        public Task<List<User>> GetPage(GetUsersQuery query)
         {
             return _mediator.Send(query);
         }

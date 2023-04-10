@@ -34,7 +34,6 @@ namespace Consumer.Infastructure.Repositories
         {
             Organization? organization = await _context
                 .Organizations
-                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Guid == organizationGuid, token);
 
             if (organization == null)

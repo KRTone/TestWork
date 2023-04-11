@@ -1,4 +1,5 @@
-﻿using Consumer.Infastructure.DataBase;
+﻿using Consumer.Domain.SeedWork;
+using Consumer.Infastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -8,7 +9,7 @@ namespace Consumer.WebApi.Utils.Infrastructure
     {
         public static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ConsumerDbContext>(options =>
+            services.AddDbContext<IUnitOfWork, ConsumerDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("Default"),
                 sqlOpts =>

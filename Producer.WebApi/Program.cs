@@ -1,8 +1,8 @@
-using Producer.Domain.Aggregates.UserAggregate;
+using Producer.Application.Commands;
 using Producer.WebApi.Utils.Application;
 using Producer.WebApi.Utils.Infrastructure;
 using Serilog;
-using UserDtos;
+using TestWorkEvents.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +21,7 @@ builder.Services
     .AddMasstransit()
     .AddAutoMapper(cfg =>
     {
-        cfg.CreateMap<User, CreateUser>();
+        cfg.CreateMap<CreateUserCommand, CreateUser>();
     });
 
 var app = builder.Build();

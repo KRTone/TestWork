@@ -1,8 +1,13 @@
-﻿namespace UserDtos
+﻿namespace TestWorkEvents.Users
 {
     public class CreateUser
     {
-        public Guid Guid { get; init; }
+        public CreateUser()
+        {
+            Guid = Guid.NewGuid();
+        }
+
+        public Guid Guid { get; }
         public string PhoneNumber { get; init; } = null!;
         public string Email { get; init; } = null!;
         public string Name { get; init; } = null!;

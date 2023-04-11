@@ -1,4 +1,5 @@
 ﻿using Consumer.Domain.Aggregates.UserAggregate;
+using Consumer.Domain.SeedWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -6,12 +7,14 @@ namespace Consumer.Application.Commands
 {
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _context;
+        private readonly IRepository<User> _userRepository;
         private readonly ILogger<CreateUserCommandHandler> _logger;
 
-        public CreateUserCommandHandler(IUserRepository userRepository, ILogger<CreateUserCommandHandler> logger)
+        public CreateUserCommandHandler(IUnitOfWork context, ILogger<CreateUserCommandHandler> logger)
         {
-            _userRepository = userRepository;
+            _context = context;
+            _userRepository = _context.UserRepository;
             _logger = logger;
         }
 
@@ -24,7 +27,7 @@ namespace Consumer.Application.Commands
 
             _userRepository.Add(user);
 
-            await _userRepository.UnitOfWork.SaveEntitiesAsync();
+            await _context.SaveEntitiesAsync();
 
             return user.Guid;
         }

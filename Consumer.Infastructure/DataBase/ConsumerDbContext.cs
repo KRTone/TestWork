@@ -2,6 +2,7 @@
 using Consumer.Domain.Aggregates.UserAggregate;
 using Consumer.Domain.SeedWork;
 using Consumer.Infastructure.DataBase.Configurations;
+using Consumer.Infastructure.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -17,6 +18,8 @@ namespace Consumer.Infastructure.DataBase
         public ConsumerDbContext(DbContextOptions<ConsumerDbContext> options, IMediator mediator) : base(options)
         {
             _mediator = mediator;
+            UserRepository = new UserRepository(this);
+            OrganizationRepository = new OrganizationRepository(this);
         }
 
         public DbSet<Organization> Organizations => Set<Organization>();
@@ -25,34 +28,37 @@ namespace Consumer.Infastructure.DataBase
         private IDbContextTransaction? _currentTransaction;
         public bool HasActiveTransaction => _currentTransaction != null;
 
+        public IRepository<User> UserRepository { get; }
+        public IRepository<Organization> OrganizationRepository { get; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
         }
 
-        public async Task<IDbContextTransaction?> BeginTransactionAsync(CancellationToken cancellationToken = default)
+        public async Task<Guid?> BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
             if (_currentTransaction != null) return null;
 
             _currentTransaction = await Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
 
-            return _currentTransaction;
+            return _currentTransaction.TransactionId;
         }
 
-        public async Task CommitTransactionAsync(IDbContextTransaction transaction, CancellationToken cancellationToken = default)
+        public async Task CommitTransactionAsync(Guid? transactionId, CancellationToken cancellationToken = default)
         {
-            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
-            if (transaction != _currentTransaction) throw new InvalidOperationException($"Transaction {transaction.TransactionId} is not current");
+            if (transactionId == null) throw new ArgumentNullException(nameof(transactionId));
+            if (transactionId != _currentTransaction.TransactionId) throw new InvalidOperationException($"Transaction {transactionId} is not current");
 
             try
             {
                 await SaveChangesAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
+                await _currentTransaction.CommitAsync(cancellationToken);
             }
             catch
             {
-                RollbackTransaction();
+                await RollbackTransactionAsync();
                 throw;
             }
             finally
@@ -65,17 +71,18 @@ namespace Consumer.Infastructure.DataBase
             }
         }
 
-        public void RollbackTransaction()
+        public async Task RollbackTransactionAsync()
         {
             try
             {
-                _currentTransaction?.RollbackAsync();
+                if (_currentTransaction != null)
+                    await _currentTransaction.RollbackAsync();
             }
             finally
             {
                 if (_currentTransaction != null)
                 {
-                    _currentTransaction.Dispose();
+                    await _currentTransaction.DisposeAsync();
                     _currentTransaction = null;
                 }
             }
@@ -85,6 +92,26 @@ namespace Consumer.Infastructure.DataBase
         {
             await _mediator.DispatchDomainEventsAsync(this);
             await SaveChangesAsync(cancellationToken);
+        }
+
+        public Domain.SeedWork.IExecutionStrategy CreateExecutionStrategy()
+        {
+            return new ExecutionStrategyWrapper(Database.CreateExecutionStrategy());
+        }
+
+        public class ExecutionStrategyWrapper : Domain.SeedWork.IExecutionStrategy
+        {
+            private readonly Microsoft.EntityFrameworkCore.Storage.IExecutionStrategy _internalStrategy;
+
+            public ExecutionStrategyWrapper(Microsoft.EntityFrameworkCore.Storage.IExecutionStrategy internalStrategy)
+            {
+                _internalStrategy = internalStrategy;
+            }
+
+            public Task ExecuteAsync(Func<Task> operation)
+            {
+                return _internalStrategy.ExecuteAsync(operation);
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 using Consumer.Application.Commands;
 using MassTransit;
 using MediatR;
-using UserDtos;
+using TestWorkEvents.Users;
 
 namespace Consumer.WebApi.Consumers
 {

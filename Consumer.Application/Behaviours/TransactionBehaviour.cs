@@ -1,7 +1,6 @@
-﻿using Consumer.Infastructure.DataBase;
+﻿//using Consumer.Domain.SeedWork;
+using Consumer.Domain.SeedWork;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
 using Utils;
@@ -10,12 +9,12 @@ namespace Consumer.Application.Behaviours
 {
     public class TransactionBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
+        private readonly IUnitOfWork _uow;
         private readonly ILogger<TransactionBehaviour<TRequest, TResponse>> _logger;
-        private readonly ConsumerDbContext _dbContext;
 
-        public TransactionBehaviour(ConsumerDbContext dbContext, ILogger<TransactionBehaviour<TRequest, TResponse>> logger)
+        public TransactionBehaviour(IUnitOfWork uow, ILogger<TransactionBehaviour<TRequest, TResponse>> logger)
         {
-            _dbContext = dbContext;
+            _uow = uow;
             _logger = logger;
         }
 
@@ -26,27 +25,25 @@ namespace Consumer.Application.Behaviours
 
             try
             {
-                if (_dbContext.HasActiveTransaction)
+                if (_uow.HasActiveTransaction)
                 {
                     return await next();
                 }
 
-                IExecutionStrategy strategy = _dbContext.Database.CreateExecutionStrategy();
+                IExecutionStrategy strategy = _uow.CreateExecutionStrategy();
 
                 await strategy.ExecuteAsync(async () =>
                 {
-                    Guid transactionId;
-
-                    await using IDbContextTransaction transaction = (await _dbContext.BeginTransactionAsync())!;
-                    using (LogContext.PushProperty("TransactionContext", transaction.TransactionId))
+                    Guid? transactionId = await _uow.BeginTransactionAsync(cancellationToken);
+                    using (LogContext.PushProperty("TransactionContext", transactionId))
                     {
-                        _logger.LogInformation($"----- Begin transaction {transaction.TransactionId} for {typeName} ({request})");
+                        _logger.LogInformation($"----- Begin transaction {transactionId} for {typeName} ({request})");
 
                         response = await next();
 
-                        _logger.LogInformation($"----- Commit transaction {transaction.TransactionId} for {typeName}");
+                        _logger.LogInformation($"----- Commit transaction {transactionId} for {typeName}");
 
-                        await _dbContext.CommitTransactionAsync(transaction);
+                        await _uow.CommitTransactionAsync(transactionId, cancellationToken);
                     }
                 });
 

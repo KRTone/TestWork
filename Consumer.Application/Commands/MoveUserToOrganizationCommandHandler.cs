@@ -1,4 +1,5 @@
 ﻿using Consumer.Domain.Aggregates.UserAggregate;
+using Consumer.Domain.SeedWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -6,12 +7,14 @@ namespace Consumer.Application.Commands
 {
     public class MoveUserToOrganizationCommandHandler : IRequestHandler<MoveUserToOrganizationCommand>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _context;
+        private IRepository<User> _userRepository;
         private readonly ILogger<MoveUserToOrganizationCommandHandler> _logger;
 
-        public MoveUserToOrganizationCommandHandler(IUserRepository userRepository, ILogger<MoveUserToOrganizationCommandHandler> logger)
+        public MoveUserToOrganizationCommandHandler(IUnitOfWork context, ILogger<MoveUserToOrganizationCommandHandler> logger)
         {
-            _userRepository = userRepository;
+            _context = context;
+            _userRepository = _context.UserRepository;
             _logger = logger;
         }
 
@@ -21,14 +24,14 @@ namespace Consumer.Application.Commands
 
             if (user == null)
             {
-                return;
+                throw new NullReferenceException(nameof(user));
             }
 
             _logger.LogInformation($"----- Moving user [{request.UserGuid}] to Organization [{request.OrganizationGuid}]");
 
             user.MoveToOrganization(request.OrganizationGuid);
 
-            await _userRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
+            await _context.SaveEntitiesAsync(cancellationToken);
         }
     }
 }

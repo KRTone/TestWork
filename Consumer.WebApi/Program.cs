@@ -3,7 +3,7 @@ using Consumer.Domain.Aggregates.UserAggregate;
 using Consumer.Infastructure.DataBase;
 using Consumer.WebApi.Utils.Application;
 using Consumer.WebApi.Utils.Infrastructure;
-using UserDtos;
+using TestWorkEvents.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 

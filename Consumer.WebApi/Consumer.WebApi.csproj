@@ -28,7 +28,7 @@
     <ProjectReference Include="..\Consumer.Domain\Consumer.Domain.csproj" />
     <ProjectReference Include="..\Consumer.Infastructure\Consumer.Infastructure.csproj" />
     <ProjectReference Include="..\Consumer.Migrations\Consumer.Migrations.csproj" />
-    <ProjectReference Include="..\UserDtos\UserDtos.csproj" />
+    <ProjectReference Include="..\TestWorkEvents\TestWorkEvents.csproj" />
   </ItemGroup>
 
 </Project>

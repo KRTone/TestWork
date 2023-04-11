@@ -20,7 +20,6 @@ namespace Consumer.UnitTests.Domain
         [Fact]
         public void Create_user_null_patronymic_success()
         {
-
             Guid guid = Guid.NewGuid();
             string phone = "somephone";
             string email = "someemail";
@@ -36,7 +35,6 @@ namespace Consumer.UnitTests.Domain
         [Fact]
         public void Invalid_user_phone()
         {
-
             Guid guid = Guid.NewGuid();
             string phone = "";
             string email = "someemail";
@@ -50,7 +48,6 @@ namespace Consumer.UnitTests.Domain
         [Fact]
         public void Invalid_user_email()
         {
-
             Guid guid = Guid.NewGuid();
             string phone = "somephone";
             string email = "";
@@ -64,7 +61,6 @@ namespace Consumer.UnitTests.Domain
         [Fact]
         public void Invalid_user_name()
         {
-
             Guid guid = Guid.NewGuid();
             string phone = "somephone";
             string email = "someemail";

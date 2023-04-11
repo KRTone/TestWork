@@ -1,4 +1,5 @@
 ﻿using Consumer.Application.Commands;
+using Consumer.Domain.SeedWork;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -6,18 +7,21 @@ namespace Consumer.UnitTests.Application
 {
     public class CreateUserCommandHandlerTests
     {
-        private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<IUnitOfWork> _context;
 
         public CreateUserCommandHandlerTests()
         {
-            _userRepositoryMock = new Mock<IUserRepository>();
-            _userRepositoryMock.Setup(buyerRepo => buyerRepo.UnitOfWork.SaveEntitiesAsync(default)).Returns(Task.CompletedTask);
+            _context = new Mock<IUnitOfWork>();
+            _context.Setup(buyerRepo => buyerRepo.SaveEntitiesAsync(default)).Returns(Task.CompletedTask);
         }
 
         [Fact]
         public async Task Handle_return_guid()
         {
             var loggerMock = new Mock<ILogger<CreateUserCommandHandler>>();
+            _context
+                .Setup(x => x.UserRepository.GetAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(It.IsAny<User>());
 
             Guid guid = Guid.NewGuid();
             string phone = "somephone";
@@ -35,7 +39,7 @@ namespace Consumer.UnitTests.Application
                 PhoneNumber = phone
             };
 
-            CreateUserCommandHandler handler = new CreateUserCommandHandler(_userRepositoryMock.Object, loggerMock.Object);
+            CreateUserCommandHandler handler = new CreateUserCommandHandler(_context.Object, loggerMock.Object);
             var token = new CancellationToken();
             var result = await handler.Handle(command, token);
 

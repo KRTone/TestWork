@@ -12,7 +12,7 @@ namespace Consumer.Domain.SeedWork
         Task<Guid?> BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(Guid? transactionId, CancellationToken cancellationToken = default);
 
-        IRepository<User> UserRepository { get; }
-        IRepository<Organization> OrganizationRepository { get; }
+        IUserRepository UserRepository { get; }
+        IOrganizationRepository OrganizationRepository { get; }
     }
 }

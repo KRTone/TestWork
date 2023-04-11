@@ -28,8 +28,8 @@ namespace Consumer.Infastructure.DataBase
         private IDbContextTransaction? _currentTransaction;
         public bool HasActiveTransaction => _currentTransaction != null;
 
-        public IRepository<User> UserRepository { get; }
-        public IRepository<Organization> OrganizationRepository { get; }
+        public IUserRepository UserRepository { get; }
+        public IOrganizationRepository OrganizationRepository { get; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

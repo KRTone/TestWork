@@ -1,4 +1,5 @@
 ﻿using Consumer.Domain.Aggregates.UserAggregate;
+using Consumer.Domain.SeedWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -9,9 +10,9 @@ namespace Consumer.Application.Queries
         private readonly ILogger<GetUsersQueryHandler> _logger;
         private readonly IUserRepository _userRepository;
 
-        public GetUsersQueryHandler(IUserRepository userRepository, ILogger<GetUsersQueryHandler> logger)
+        public GetUsersQueryHandler(IUnitOfWork context, ILogger<GetUsersQueryHandler> logger)
         {
-            _userRepository = userRepository;
+            _userRepository = context.UserRepository;
             _logger = logger;
         }
 

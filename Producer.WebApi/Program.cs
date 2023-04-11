@@ -21,7 +21,8 @@ builder.Services
     .AddMasstransit()
     .AddAutoMapper(cfg =>
     {
-        cfg.CreateMap<CreateUserCommand, CreateUser>();
+        cfg.CreateMap<CreateUserCommand, CreateUser>()
+            .ForMember(x => x.Guid, opt => opt.MapFrom(x => Guid.NewGuid()));
     });
 
 var app = builder.Build();

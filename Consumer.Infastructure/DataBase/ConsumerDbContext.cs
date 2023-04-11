@@ -110,6 +110,7 @@ namespace Consumer.Infastructure.DataBase
 
             public Task ExecuteAsync(Func<Task> operation)
             {
+                //return _internalStrategy.ExecuteInTransactionAsync(operation, verifySucceeded: () => );
                 return _internalStrategy.ExecuteAsync(operation);
             }
         }

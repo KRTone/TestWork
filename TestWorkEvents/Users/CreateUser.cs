@@ -2,12 +2,7 @@
 {
     public class CreateUser
     {
-        public CreateUser()
-        {
-            Guid = Guid.NewGuid();
-        }
-
-        public Guid Guid { get; }
+        public Guid Guid { get; init; }
         public string PhoneNumber { get; init; } = null!;
         public string Email { get; init; } = null!;
         public string Name { get; init; } = null!;

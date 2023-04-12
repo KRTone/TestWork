@@ -21,7 +21,7 @@ namespace Producer.Application.Behaviours
         {
             var typeName = request.GetGenericTypeName();
 
-            _logger.LogInformation("----- Validating command {CommandType}", typeName);
+            _logger.LogInformation($"----- Validating command {typeName}");
 
             var failures = _validators
                 .Select(v => v.Validate(request))

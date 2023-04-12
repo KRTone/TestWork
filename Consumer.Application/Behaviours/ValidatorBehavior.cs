@@ -21,7 +21,7 @@ namespace Consumer.Application.Behaviours
         {
             var typeName = request.GetGenericTypeName();
 
-            _logger.LogInformation("----- Validating command {CommandType}", typeName);
+            _logger.LogInformation($"----- Validating command {typeName}");
 
             var failures = _validators
                 .Select(v => v.Validate(request))
@@ -31,7 +31,7 @@ namespace Consumer.Application.Behaviours
 
             if (failures.Any())
             {
-                _logger.LogWarning("Validation errors - {CommandType} - Command: {@Command} - Errors: {@ValidationErrors}", typeName, request, failures);
+                _logger.LogWarning($"Validation errors - {typeName} - Command: {request} - Errors: {failures}");
 
                 throw new ConsumerDomainException($"Command Validation Errors for type {typeof(TRequest).Name}", new ValidationException("Validation exception", failures));
             }

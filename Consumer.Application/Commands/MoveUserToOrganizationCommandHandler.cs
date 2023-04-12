@@ -1,11 +1,12 @@
-﻿using Consumer.Domain.Aggregates.UserAggregate;
+﻿using Consumer.Application.Interfaces;
+using Consumer.Domain.Aggregates.UserAggregate;
 using Consumer.Domain.SeedWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Consumer.Application.Commands
 {
-    public class MoveUserToOrganizationCommandHandler : IRequestHandler<MoveUserToOrganizationCommand>
+    public class MoveUserToOrganizationCommandHandler : IRequestHandler<MoveUserToOrganizationCommand>, ITransactionable
     {
         private readonly IUnitOfWork _context;
         private IRepository<User> _userRepository;

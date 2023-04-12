@@ -1,11 +1,12 @@
-﻿using Consumer.Domain.Aggregates.UserAggregate;
+﻿using Consumer.Application.Interfaces;
+using Consumer.Domain.Aggregates.UserAggregate;
 using Consumer.Domain.SeedWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Consumer.Application.Commands
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>, ITransactionable
     {
         private readonly IUnitOfWork _context;
         private readonly IRepository<User> _userRepository;

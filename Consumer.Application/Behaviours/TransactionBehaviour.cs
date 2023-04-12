@@ -1,4 +1,5 @@
 ﻿//using Consumer.Domain.SeedWork;
+using Consumer.Application.Interfaces;
 using Consumer.Domain.SeedWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,9 @@ namespace Consumer.Application.Behaviours
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
+            if (request is not ITransactionable)
+                return await next();
+
             TResponse response = default;
             string typeName = request.GetGenericTypeName();
 

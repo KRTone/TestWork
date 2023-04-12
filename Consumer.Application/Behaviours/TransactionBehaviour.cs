@@ -21,19 +21,14 @@ namespace Consumer.Application.Behaviours
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            if (request is not ITransactionable)
+            if (request is not ITransactionable || _uow.HasActiveTransaction)
                 return await next();
 
-            TResponse response = default;
             string typeName = request.GetGenericTypeName();
 
             try
             {
-                if (_uow.HasActiveTransaction)
-                {
-                    return await next();
-                }
-
+                TResponse response = default;
                 IExecutionStrategy strategy = _uow.CreateExecutionStrategy();
 
                 await strategy.ExecuteAsync(async () =>
